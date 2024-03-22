@@ -136,13 +136,12 @@ class Point:
             raise ValueError('({}, {}) is not on the curve'.format(x, y))
 
     def __eq__(self, other):  # <2>
-        return self.x == other.x and self.y == other.y \
-            and self.a == other.a and self.b == other.b
+        return self.x == other.x and self.y == other.y and self.a == other.a and self.b == other.b
     # end::source1[]
 
     def __ne__(self, other):
-        # this should be the inverse of the == operator
-        raise NotImplementedError
+        # this should be the inverse of the == 
+        return not (self == other)
 
     def __repr__(self):
         if self.x is None:
@@ -164,8 +163,17 @@ class Point:
 
         # Case 1: self.x == other.x, self.y != other.y
         # Result is point at infinity
+        if self.x == other.x and self.y != other.y:
+            return self.__class__(None, None, self.a, self.b)
 
         # Case 2: self.x ≠ other.x
+        if self.x != other.x:
+            # Formula (x3,y3)=(x1,y1)+(x2,y2)
+            s = (other.y - self.y) / (other.x - self.x)
+            x = s**2 - self.x - other.x
+            y = s * (self.x - x) - self.y
+            return self.__class__(x, y, self.a, self.b)
+        
         # Formula (x3,y3)==(x1,y1)+(x2,y2)
         # s=(y2-y1)/(x2-x1)
         # x3=s**2-x1-x2
